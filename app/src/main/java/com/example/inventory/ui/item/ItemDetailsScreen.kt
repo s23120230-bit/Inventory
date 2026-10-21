@@ -57,6 +57,10 @@ import com.example.inventory.R
 import com.example.inventory.data.Item
 import com.example.inventory.ui.navigation.NavigationDestination
 import com.example.inventory.ui.theme.InventoryTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.inventory.ui.AppViewModelProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.foundation.layout.padding
 
 object ItemDetailsDestination : NavigationDestination {
     override val route = "item_details"
@@ -65,13 +69,17 @@ object ItemDetailsDestination : NavigationDestination {
     val routeWithArgs = "$route/{$itemIdArg}"
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemDetailsScreen(
     navigateToEditItem: (Int) -> Unit,
     navigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ItemDetailsViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+
+    val uiState = viewModel.uiState.collectAsState()
     Scaffold(
         topBar = {
             InventoryTopAppBar(
@@ -95,16 +103,10 @@ fun ItemDetailsScreen(
         }, modifier = modifier
     ) { innerPadding ->
         ItemDetailsBody(
-            itemDetailsUiState = ItemDetailsUiState(),
-            onSellItem = { },
+            itemDetailsUiState = uiState.value,
+            onSellItem = {  },
             onDelete = { },
-            modifier = Modifier
-                .padding(
-                    start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
-                    end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
-                    top = innerPadding.calculateTopPadding()
-                )
-                .verticalScroll(rememberScrollState())
+            modifier = modifier.padding(innerPadding)
         )
     }
 }
@@ -250,3 +252,4 @@ fun ItemDetailsScreenPreview() {
         )
     }
 }
+
